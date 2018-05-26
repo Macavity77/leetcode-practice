@@ -47,7 +47,7 @@ public class solution {
         return dummy.next;
     }
 
-    public String reverseWords(String s) {
+    public static String reverseWords(String s) {
         if (s == null || s.length() == 0) {
             return s;
         }
@@ -59,7 +59,7 @@ public class solution {
         return removespace(a, n);
     }
 
-    private void reverse(char[] a, int start, int end) {
+    private static void reverse(char[] a, int start, int end) {
         while (start < end) {
             char temp = a[start];
             a[start++] = a[end];
@@ -67,21 +67,21 @@ public class solution {
         }
     }
 
-    private void reverseWord(char[] a, int length) {
+    private static void reverseWord(char[] a, int length) {
         int pre = 0;
         int end = 0;
         while (pre < length) {
-            while ((pre < end || a[pre] == ' ') && pre < length) {
+            while (pre < length && (pre < end || a[pre] == ' ')) {
                 pre++;
             }
-            while ((end < pre || a[end] != ' ') && end < length) {
+            while (end < length && (end < pre || a[end] != ' ')) {
                 end++;
             }
             reverse(a, pre, end - 1);
         }
     }
 
-    private String removespace(char[] a, int length) {
+    private static String removespace(char[] a, int length) {
         int pre = 0;
         int end = 0;
         while (end < length) {
@@ -103,14 +103,26 @@ public class solution {
         return new String(a).substring(0, pre);
     }
 
+    public static int maxProduct(int[] nums) {
+        int[] dp = new int[nums.length + 1];
+        dp[0] = 0;
+        for (int i = 0; i < nums.length; i++) {
+            dp[i + 1] = Math.max(dp[i], Math.max(dp[i] * nums[i], nums[i]));
+        }
+        return dp[nums.length];
+    }
+
     public static void main(String[] args) {
-        ListNode l = new ListNode(4);
-        ListNode l2 = new ListNode(2);
-        ListNode l3 = new ListNode(1);
-        ListNode l4 = new ListNode(3);
-        l.next = l2;
-        l2.next = l3;
-        l3.next = l4;
-        sortList(l);
+//        ListNode l = new ListNode(4);
+//        ListNode l2 = new ListNode(2);
+//        ListNode l3 = new ListNode(1);
+//        ListNode l4 = new ListNode(3);
+//        l.next = l2;
+//        l2.next = l3;
+//        l3.next = l4;
+//        sortList(l);
+//        reverseWords("the sky is blue");
+        int[] temp = new int[]{2,3,-2,4};
+        System.out.println(maxProduct(temp));
     }
 }
