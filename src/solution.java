@@ -1,3 +1,7 @@
+import java.util.Collections;
+import java.util.PriorityQueue;
+import java.util.Queue;
+
 public class solution {
     public static ListNode sortList(ListNode head) {
         if (head == null || head.next == null) {
@@ -104,12 +108,91 @@ public class solution {
     }
 
     public static int maxProduct(int[] nums) {
-        int[] dp = new int[nums.length + 1];
-        dp[0] = 0;
-        for (int i = 0; i < nums.length; i++) {
-            dp[i + 1] = Math.max(dp[i], Math.max(dp[i] * nums[i], nums[i]));
+        int maxhere = nums[0];
+        int minhere = nums[0];
+        int result = nums[0];
+
+        for (int i = 1; i < nums.length; i++) {
+            if (nums[i] < 0) {
+                int temp = maxhere;
+                maxhere = minhere;
+                minhere = temp;
+            }
+
+            maxhere = Math.max(maxhere, maxhere * nums[i]);
+            minhere = Math.min(minhere, minhere * nums[i]);
+
+            result = Math.max(result, maxhere);
         }
-        return dp[nums.length];
+
+        return result;
+    }
+
+    public static int numIslands(int[][] grid) {
+        if (grid == null || grid.length == 0 || grid[0].length == 0) {
+            return 0;
+        }
+        int row = grid.length;
+        int column = grid[0].length;
+
+        UnionFind f = new UnionFind(row * column);
+        int total = 0;
+        for (int i = 0; i < row; i++) {
+            for (int j = 0; j < column; j++) {
+                if (grid[i][j] == 1) {
+                    total++;
+                }
+            }
+        }
+        f.set_count(total);
+
+        for (int i = 0; i < row; i++) {
+            for (int j = 0; j < column; j++) {
+                if (grid[i][j] == 1) {
+                    if (i > 0 && grid[i - 1][j] == 1) {
+                        f.connect(i * column + j, (i - 1) * column + j);
+                    }
+                    if (i < row - 1 && grid[i + 1][j] == 1) {
+                        f.connect(i * column + j, (i + 1) * column + j);
+                    }
+                    if (j > 0 && grid[i][j - 1] == 1) {
+                        f.connect(i * column + j, i * column + j - 1);
+                    }
+                    if (j < row - 1 && grid[i][j + 1] == 1) {
+                        f.connect(i * column + j, i * column + j + 1);
+                    }
+                }
+            }
+        }
+        return f.query();
+    }
+
+    public static int maxProfit(int k, int[] prices) {
+        if (prices == null || prices.length == 0 || k == 0) {
+            return 0;
+        }
+        int start = prices[0];
+        int end = 0;
+        int result = 0;
+        Queue<Integer> pq = new PriorityQueue<>(k, Collections.reverseOrder());
+        for (int i = 1; i < prices.length; i++) {
+            if (i != prices.length - 1 && (prices[i] < prices[i - 1] && prices[i] < prices[i + 1])) {
+                start = prices[i];
+            }
+            if (i != prices.length - 1 && (prices[i] > prices[i - 1] && prices[i] > prices[i + 1])) {
+                end = prices[i];
+                pq.offer(end - start);
+                continue;
+            }
+            if (i == prices.length - 1 && prices[i] > prices[i - 1]) {
+                end = prices[i];
+                pq.offer(end - start);
+            }
+        }
+        while (k > 0 && pq.size() > 0) {
+            result += pq.poll();
+        }
+        return result;
     }
 
     public static void main(String[] args) {
@@ -122,7 +205,7 @@ public class solution {
 //        l3.next = l4;
 //        sortList(l);
 //        reverseWords("the sky is blue");
-        int[] temp = new int[]{2,3,-2,4};
-        System.out.println(maxProduct(temp));
+        int[] temp = new int[]{2,1,2,1,0,0,1};
+        System.out.println(maxProfit(2, temp));
     }
 }
