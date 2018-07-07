@@ -1,6 +1,4 @@
-import java.util.Collections;
-import java.util.PriorityQueue;
-import java.util.Queue;
+import java.util.*;
 
 public class solution {
     public static ListNode sortList(ListNode head) {
@@ -195,6 +193,73 @@ public class solution {
         return result;
     }
 
+    public static int numDecodings(String s) {
+        if (s == null || s.length() == 0) {
+            return 0;
+        }
+
+        char[] CharArray = s.toCharArray();
+        int[] dp = new int[s.length() + 1];
+        dp[0] = 1;
+        if (CharArray[0] - '0' != 0) {
+            dp[1] = 1;
+        }
+        for (int i = 2; i <= s.length(); i++) {
+            int single = CharArray[i - 1] - '0';
+            int doubleNum = CharArray[i - 1] - '0' + (CharArray[i - 2] - '0') * 10;
+            dp[i] = (single == 0 ? 0 : dp[i - 1]) + (doubleNum >= 10 && doubleNum <= 26 ? dp[i - 2] : 0);
+        }
+        return dp[s.length()];
+    }
+
+    public static int trailingZeroes(int n) {
+        if (n < 0) {
+            return -1;
+        }
+
+        if (n == 0 || n == 1) {
+            return 0;
+        }
+        long factorial = 1;
+        while (n > 1) {
+            factorial = factorial * n;
+            n = n - 1;
+        }
+
+        int result = 0;
+        while (true) {
+            if (factorial % 10 == 0) {
+                result ++;
+                factorial = factorial / 10;
+            } else {
+                break;
+            }
+        }
+        return result;
+    }
+
+    public static List<String> findRepeatedDnaSequences(String s) {
+        List<String> counter = new ArrayList<>();
+        if (s == null || s.length() <= 10) {
+            return counter;
+        }
+        Map<String, Integer> bank = new HashMap<>();
+        for (int i = 0; i <= s.length() - 10; i++) {
+            String temp = s.substring(i, i + 10);
+            if (!bank.containsKey(temp)) {
+                bank.put(temp, 1);
+                continue;
+            } else {
+                //if contains
+                if (bank.get(temp) == 1) {
+                    counter.add(temp);
+                    bank.put(temp, bank.get(temp) + 1);
+                }
+            }
+        }
+        return counter;
+    }
+
     public static void main(String[] args) {
 //        ListNode l = new ListNode(4);
 //        ListNode l2 = new ListNode(2);
@@ -205,7 +270,6 @@ public class solution {
 //        l3.next = l4;
 //        sortList(l);
 //        reverseWords("the sky is blue");
-        int[] temp = new int[]{2,1,2,1,0,0,1};
-        System.out.println(maxProfit(2, temp));
+        System.out.println(findRepeatedDnaSequences("AAAAAAAAAAAA"));
     }
 }
