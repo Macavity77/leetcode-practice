@@ -1,3 +1,5 @@
+import sun.jvm.hotspot.utilities.Interval;
+
 import java.util.*;
 
 public class solution {
@@ -258,6 +260,35 @@ public class solution {
             }
         }
         return counter;
+
+    }
+
+    public static int[][] reconstructQueue(int[][] people) {
+        if (people == null || people.length == 0 || people[0].length == 0) {
+            return people;
+        }
+
+        Arrays.sort(people, new Comparator<int[]>() {
+            public int compare(int[] a, int[] b) {
+                if (a[0] == b[0]) {
+                    return a[1] - b[1];
+                }
+                return b[0] - a[0];
+            }
+        });
+
+        List<int[]> temp = new ArrayList<>();
+        for (int[] p : people) {
+            temp.add(p[1], new int[]{p[0], p[1]});
+        }
+
+        int[][] result = new int[people.length][2];
+        int i = 0;
+        for (int[] t : temp) {
+            result[i][0] = t[0];
+            result[i++][1] = t[1];
+        }
+        return result;
     }
 
     public static void main(String[] args) {
@@ -270,6 +301,7 @@ public class solution {
 //        l3.next = l4;
 //        sortList(l);
 //        reverseWords("the sky is blue");
-        System.out.println(findRepeatedDnaSequences("AAAAAAAAAAAA"));
+        int[][] temp = new int[][]{{7,0},{4,4},{7,1},{5,0},{6,1},{5,2}};
+        System.out.println(reconstructQueue(temp));
     }
 }
