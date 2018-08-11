@@ -291,6 +291,74 @@ public class solution {
         return result;
     }
 
+    public static void gameOfLife(int[][] board) {
+        if (board == null || board.length == 0 || board[0].length == 0) {
+            return;
+        }
+
+        int row = board.length;
+        int column = board[0].length;
+        for (int i = 0; i < row; i++) {
+            for (int j = 0; j < column; j++) {
+                int lives = findNeighbor(board, i, j, row, column);
+
+                if (board[i][j] == 1 && lives >= 2 && lives <= 3) {
+                    board[i][j] = 3;
+                }
+
+                if (board[i][j] == 0 && lives == 3) {
+                    board[i][j] = 2;
+                }
+            }
+        }
+
+        for (int i = 0; i < row; i++) {
+            for (int j = 0; j < column; j++) {
+                board[i][j] >>= 1;
+            }
+        }
+
+        return;
+    }
+
+    private static int findNeighbor(int[][] board, int i, int j, int row, int column) {
+        int lives = 0;
+        for (int x = Math.max(0, i - 1); x <= Math.min(row - 1, i + 1); x++) {
+            for (int y = Math.max(0, j - 1); y <= Math.min(column - 1, j + 1); y++) {
+                lives += board[x][y] & 1;
+            }
+        }
+
+        return lives - board[i][j] & 1;
+    }
+
+    public static int[] dailyTemperatures(int[] temperatures) {
+        if (temperatures == null || temperatures.length == 0) {
+            return new int[]{};
+        }
+
+        int[] result = new int[temperatures.length];
+        int maxsofar = temperatures[temperatures.length - 1];
+        for (int i = temperatures.length - 2; i >= 0; i--) {
+            maxsofar = Math.max(maxsofar, temperatures[i]);
+            if (temperatures[i] < temperatures[i + 1]) {
+                result[i] = 1;
+                continue;
+            } else if (temperatures[i] >= maxsofar) {
+                result[i] = 0;
+            } else {
+                for (int j = i + 1; j < temperatures.length; j++) {
+                    result[i]++;
+                    if (temperatures[j] > temperatures[i]) {
+                        break;
+                    }
+                }
+            }
+        }
+
+        return result;
+    }
+
     public static void main(String[] args) {
 //        ListNode l = new ListNode(4);
 //        ListNode l2 = new ListNode(2);
@@ -300,8 +368,10 @@ public class solution {
 //        l2.next = l3;
 //        l3.next = l4;
 //        sortList(l);
-//        reverseWords("the sky is blue");
-        int[][] temp = new int[][]{{7,0},{4,4},{7,1},{5,0},{6,1},{5,2}};
-        System.out.println(reconstructQueue(temp));
+////        reverseWords("the sky is blue");
+//        int[][] temp = new int[][]{{0,1,0},{0,0,1},{1,1,1},{0,0,0}};
+//        gameOfLife(temp);
+        int[] temp = new int[]{77,77,77,77,77,41,77,41,41,77};
+        System.out.print(Arrays.toString(dailyTemperatures(temp)));
     }
 }
