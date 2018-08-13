@@ -359,9 +359,128 @@ public class solution {
         return result;
     }
 
+    public static int[] dailyTemperatures1(int[] temperatures) {
+        if (temperatures == null || temperatures.length == 0) {
+            return new int[]{};
+        }
+
+        int[] result = new int[temperatures.length];
+        Stack<Integer> stack = new Stack<>();
+        for (int i = temperatures.length - 1; i >= 0; i--) {
+            while (!stack.isEmpty() && temperatures[i] >= temperatures[stack.peek()]) {
+                stack.pop();
+            }
+            result[i] = stack.isEmpty() ? 0 : stack.peek() - i;
+            stack.push(i);
+        }
+        return result;
+    }
+
+    public static int largestRectangleArea(int[] heights) {
+        Stack < Integer > stack = new Stack < > ();
+        stack.push(-1);
+        int maxarea = 0;
+        for (int i = 0; i < heights.length; ++i) {
+            while (stack.peek() != -1 && heights[stack.peek()] >= heights[i])
+                maxarea = Math.max(maxarea, heights[stack.pop()] * (i - stack.peek() - 1));
+            stack.push(i);
+        }
+        while (stack.peek() != -1)
+            maxarea = Math.max(maxarea, heights[stack.pop()] * (heights.length - stack.peek() -1));
+        return maxarea;
+    }
+
+    public static boolean isPalindrome(ListNode head) {
+        if (head == null || head.next == null) {
+            return true;
+        }
+
+        ListNode fast = head;
+        ListNode slow = head;
+
+        while (fast != null && fast.next != null) {
+            slow = slow.next;
+            fast = fast.next.next;
+        }
+        //odd number of nodes
+        if (fast != null) {
+            slow = slow.next;
+        }
+
+        slow = reverse(slow);
+        fast = head;
+
+        while (slow != null) {
+            if (slow.val != fast.val) {
+                return false;
+            }
+            slow = slow.next;
+            fast = fast.next;
+        }
+        return true;
+    }
+
+    private static ListNode reverse(ListNode head) {
+        ListNode pre = null;
+        while (head != null) {
+            ListNode temp = head.next;
+            head.next = pre;
+            pre = head;
+            head = temp;
+        }
+        return pre;
+    }
+
+    public static String minWindow(String s, String t) {
+
+        int s_len = s.length();
+        int t_len = t.length();
+        int ruler = t_len;
+
+        int res = Integer.MAX_VALUE;
+        int start = 0;
+
+        int[] freq = new int[128];
+
+        char[] c_s = s.toCharArray();
+        char[] c_t = t.toCharArray();
+
+        // count char in t
+        for (char c : c_t)
+            freq[c]++;
+
+        int i = 0, j = 0;
+        while (j < s_len) {
+
+            // whether ruler can expand
+            if (freq[c_s[j++]]-- >= 1)
+                ruler--;
+
+            // if ruler == 0, it means all char in t has been contained in window now
+            while (ruler == 0) {
+
+                // choose min window
+                if (res > j - i) {
+                    res = j - i;
+                    start = i;
+                }
+
+                // narrow left border
+                if (freq[c_s[i++]]++ == 0)
+                    ruler++;
+
+            }
+
+        }
+
+        return res == Integer.MAX_VALUE ? "" : s.substring(start, start + res);
+
+    }
+
     public static void main(String[] args) {
-//        ListNode l = new ListNode(4);
+//        ListNode l = new ListNode(1);
 //        ListNode l2 = new ListNode(2);
+//        l.next = l2;
 //        ListNode l3 = new ListNode(1);
 //        ListNode l4 = new ListNode(3);
 //        l.next = l2;
@@ -371,7 +490,6 @@ public class solution {
 ////        reverseWords("the sky is blue");
 //        int[][] temp = new int[][]{{0,1,0},{0,0,1},{1,1,1},{0,0,0}};
 //        gameOfLife(temp);
-        int[] temp = new int[]{77,77,77,77,77,41,77,41,41,77};
-        System.out.print(Arrays.toString(dailyTemperatures(temp)));
+        System.out.print(minWindow("ADOBECODEBANC", "ABC"));
     }
 }
