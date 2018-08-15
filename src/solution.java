@@ -195,7 +195,7 @@ public class solution {
         return result;
     }
 
-    public static int numDecodings(String s) {
+    public static int numDecodings2(String s) {
         if (s == null || s.length() == 0) {
             return 0;
         }
@@ -465,6 +465,34 @@ public class solution {
         return result == Integer.MAX_VALUE? "" : s.substring(start, start + result);
     }
 
+    public static int numDecodings(String s) {
+        if (s == null || s.length() == 0) {
+            return 0;
+        }
+        int length = s.length();
+        int pre = 1;
+        int cur = s.charAt(0) == '0'? 0 : 1;
+        for (int i = 1; i < length; i++) {
+            int temp = cur;
+            int value = Integer.valueOf(s.substring(i - 1, i + 1));
+            if (1 <= value && value <= 26) {
+                if (s.charAt(i) != '0') {
+                    cur += pre;
+                } else {
+                    cur = pre;
+                }
+            } else {
+                if (s.charAt(i) != 0) {
+                    cur = cur;
+                } else {
+                    continue;
+                }
+            }
+            pre = temp;
+        }
+        return cur;
+    }
+
     public static void main(String[] args) {
 //        ListNode l = new ListNode(1);
 //        ListNode l2 = new ListNode(2);
@@ -478,6 +506,6 @@ public class solution {
 ////        reverseWords("the sky is blue");
 //        int[][] temp = new int[][]{{0,1,0},{0,0,1},{1,1,1},{0,0,0}};
 //        gameOfLife(temp);
-        System.out.print(minWindow("ADOBECODEBANC", "ABC"));
+        System.out.print(numDecodings("01"));
     }
 }
