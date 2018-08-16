@@ -493,6 +493,47 @@ public class solution {
         return cur;
     }
 
+    public static boolean checkInclusion(String s1, String s2) {
+        if (s1.length() > s2.length()) {
+            return false;
+        }
+        int count = 0;
+        int[] s1map = new int[26];
+        int[] s2map = new int[26];
+
+        for (int i = 0; i < s1.length(); i++) {
+            s1map[s1.charAt(i) - 'a']++;
+            s2map[s2.charAt(i) - 'a']++;
+        }
+
+        for (int i = 0; i < 26; i++) {
+            if (s1map[i] == s2map[i]) {
+                count++;
+            }
+        }
+        int right = 0, left = 0;
+        for (int i = 0; i < s2.length() - s1.length(); i++) {
+            right = s2.charAt(i + s1.length()) - 'a';
+            left = s2.charAt(i) - 'a';
+            if (count == 26) {
+                return true;
+            }
+            s2map[right]++;
+            if (s2map[right] == s1map[right]) {
+                count++;
+            } else if (s2map[right] == s1map[right] + 1) {//通过这个方式监控从match到非match来减少count
+                count--;
+            }
+            s2map[left]--;
+            if (s2map[left] == s1map[left]) {
+                count++;
+            } else if (s2map[left] == s1map[left] - 1) {
+                count--;
+            }
+        }
+        return count == 26;//final round match here
+    }
+
     public static void main(String[] args) {
 //        ListNode l = new ListNode(1);
 //        ListNode l2 = new ListNode(2);
@@ -506,6 +547,6 @@ public class solution {
 ////        reverseWords("the sky is blue");
 //        int[][] temp = new int[][]{{0,1,0},{0,0,1},{1,1,1},{0,0,0}};
 //        gameOfLife(temp);
-        System.out.print(numDecodings("01"));
+        System.out.print(checkInclusion("eb", "eidbaooo"));
     }
 }
