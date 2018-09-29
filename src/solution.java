@@ -1,3 +1,4 @@
+import javafx.util.Pair;
 import sun.jvm.hotspot.utilities.Interval;
 
 import java.util.*;
@@ -377,7 +378,7 @@ public class solution {
     }
 
     public static int largestRectangleArea(int[] heights) {
-        Stack < Integer > stack = new Stack < > ();
+        Stack <Integer> stack = new Stack < > ();
         stack.push(-1);
         int maxarea = 0;
         for (int i = 0; i < heights.length; ++i) {
@@ -534,19 +535,481 @@ public class solution {
         return count == 26;//final round match here
     }
 
+    public static int maxSubArrayLen(int[] nums, int k) {
+        if (nums == null || nums.length == 0) {
+            return 0;
+        }
+        int sum = 0;
+        int result = 0;
+        Map<Integer, Integer> map = new HashMap<>();
+        for (int i = 0; i < nums.length; i++) {
+            sum += nums[i];
+            if (sum == k) {
+                result = i + 1;
+            } else if (map.containsKey(sum - k)) {
+                result = Math.max(result, i - map.get(sum - k));
+            }
+            if (!map.containsKey(sum)) {
+                map.put(sum, i);
+            }
+        }
+        return result;
+    }
+
+    public static int[] findDiagonalOrder(int[][] matrix) {
+        if (matrix == null || matrix.length == 0) {
+            return new int[]{};
+        }
+        int row = matrix.length;
+        int column = matrix[0].length;
+        int[] result = new int[row * column];
+        int r = 0, c = 0;
+        for (int i = 0; i < result.length; i++) {
+            result[i] = matrix[r][c];
+            if ((r + c) % 2 == 0) {
+                if (c == column - 1) {
+                    r++;
+                } else if (r == 0) {
+                    c++;
+                } else {
+                    r--;
+                    c++;
+                }
+            } else {
+                if (r == row - 1) {
+                    c++;
+                } else if (c == 0) {
+                    r++;
+                } else {
+                    r++;
+                    c--;
+                }
+            }
+        }
+        return result;
+    }
+
+    static int[][] grid;
+    static boolean[][] seen;
+    static List<Integer> shape;
+    public static int numDistinctIslands(int[][] grd) {
+        if (grd == null || grd.length == 0) {
+            return 0;
+        }
+        grid = grd;
+        seen = new boolean[grid.length][grid[0].length];
+        Set<List<Integer>> shapes = new HashSet<>();
+        for (int i = 0; i < grid.length; i++) {
+            for (int j = 0; j < grid[0].length; j++) {
+                if (grid[i][j] == 1) {
+                    shape = new ArrayList<>();
+                    explore(i, j, 0);
+                    if (shape.size() != 0) {
+                        shapes.add(shape);
+                    }
+                }
+            }
+        }
+        return shapes.size();
+    }
+
+    private static void explore(int x, int y, int direction) {
+        if (x < 0 || x >= grid.length || y < 0 || y >= grid[0].length
+                || seen[x][y] == true || grid[x][y] == 0) {
+            return;
+        }
+        seen[x][y] = true;
+        shape.add(direction);
+        explore(x - 1, y, 1);
+        explore(x + 1, y, 2);
+        explore(x, y - 1, 3);
+        explore(x, y + 1, 4);
+        shape.add(0);
+    }
+
+    public static TreeNode constructMaximumBinaryTree(int[] nums) {
+        if (nums == null || nums.length == 0) {
+            return null;
+        }
+        return helper(nums, 0, nums.length - 1);
+    }
+
+    private static TreeNode helper(int[] nums, int start, int end) {
+        if (start > end) {
+            return null;
+        }
+        if (start == end) {
+            return new TreeNode(nums[start]);
+        }
+        int maximum = Integer.MIN_VALUE, index = 0;
+        for (int i = start; i <= end; i++) {
+            if (nums[i] > maximum) {
+                maximum = nums[i];
+                index = i;
+            }
+        }
+        TreeNode root = new TreeNode(maximum);
+        root.left = helper(nums, start, index - 1);
+        root.right = helper(nums, index + 1, end);
+        return root;
+    }
+
+    public static TreeNode constructMaximumBinaryTree1(int[] nums) {
+        Deque<TreeNode> stack = new LinkedList<>();
+        for(int i = 0; i < nums.length; i++) {
+            TreeNode curr = new TreeNode(nums[i]);
+            while(!stack.isEmpty() && stack.peek().val < nums[i]) {
+                curr.left = stack.pop();
+            }
+            if(!stack.isEmpty()) {
+                stack.peek().right = curr;
+            }
+            stack.push(curr);
+        }
+
+        return stack.isEmpty() ? null : stack.removeLast();
+    }
+
+    static int[][] localSum;
+    public static void NumMatrix(int[][] matrix) {
+        localSum = new int[matrix.length + 1][matrix[0].length + 1];
+        for (int i = 0; i < matrix.length; i++) {
+            localSum[i + 1][1] = localSum[i][1] + matrix[i][0];
+        }
+        for (int j = 0; j < matrix[0].length; j++) {
+            localSum[1][j + 1] = localSum[1][j] + matrix[0][j];
+        }
+        for (int i = 1; i < matrix.length; i++) {
+            for (int j = 1; j < matrix[0].length; j++) {
+                localSum[i + 1][j + 1] = localSum[i + 1][j] + localSum[i][j + 1] - localSum[i][j] + matrix[i][j];
+            }
+        }
+    }
+
+    public static int sumRegion(int row1, int col1, int row2, int col2) {
+        return localSum[row2 + 1][col2 + 1] - localSum[row2 + 1][col1] - localSum[row1][col2 + 1] + localSum[row1][col1];
+    }
+
+    public static ListNode addTwoNumbers(ListNode l1, ListNode l2) {
+        l1 = reverseList(l1);
+        l2 = reverseList(l2);
+        int carry = 0;
+        ListNode dummy = new ListNode(0);
+        ListNode result = dummy;
+        int temp;
+        while (l1 != null && l2 != null) {
+            temp = l1.val + l2.val + carry;
+            l1.val = temp % 10;
+            carry = temp / 10;
+            result.next = l1;
+            result = result.next;
+            l1 = l1.next;
+            l2 = l2.next;
+        }
+        while (l1 != null) {
+            l1.val += carry;
+            carry = 0;
+            result.next = l1;
+            result = result.next;
+            l1 = l1.next;
+        }
+        while (l2 != null) {
+            l2.val += carry;
+            carry = 0;
+            result.next = l2;
+            result = result.next;
+            l2 = l2.next;
+        }
+        return reverseList(dummy.next);
+    }
+
+    private static ListNode reverseList(ListNode head) {
+        if (head == null || head.next == null) {
+            return head;
+        }
+        ListNode pre = null;
+        ListNode temp;
+        while (head != null) {
+            temp = head.next;
+            head.next = pre;
+            pre = head;
+            head = temp;
+        }
+        return pre;
+    }
+
+    public static boolean backspaceCompare(String S, String T) {
+        Stack<Character> stackS = new Stack<>();
+        Stack<Character> stackT = new Stack<>();
+
+        for (char c : S.toCharArray()) {
+            if (c == '#' && !stackS.isEmpty()) {
+                stackS.pop();
+            } else if (c != '#'){
+                stackS.push(c);
+            }
+        }
+        for (char c : T.toCharArray()) {
+            if (c == '#' && !stackT.isEmpty()) {
+                stackT.pop();
+            } else if (c != '#') {
+                stackT.push(c);
+            }
+        }
+        while (!stackS.isEmpty() && !stackT.isEmpty()) {
+            if (stackS.pop() != stackT.pop()) {
+                return false;
+            }
+        }
+        return stackS.isEmpty() && stackT.isEmpty();
+    }
+
+    static class Node {
+        int val;
+        Node next;
+        Node pre;
+        Node(int x) {
+            val = x;
+            next = null;
+            pre = null;
+        }
+    }
+
+    public static Node deleteFromDoubleLinkedList(Node head, Node node) {
+        if (head == null || node == null) {
+            return head;
+        }
+        Node dummy = new Node(0);
+        dummy.next = head;
+        if (head == node) {
+            dummy.next = node.next;
+        }
+        if (node.pre != null) {
+            node.pre.next = node.next;
+        }
+        if (node.next != null) {
+            node.next.pre = node.pre;
+        }
+        return dummy.next;
+    }
+
+    public static List<String> generatePalindromes(String s) {
+        int[] count = new int[128];
+        for (char c : s.toCharArray()) {
+            count[c]++;
+        }
+        int oddPart = 0;
+        String odd = "";
+        char[] bank = new char[s.length() / 2];
+        int indexBank = 0;
+        for (int i = 0; i < 128; i++) {
+            if (count[i] % 2 != 0) {
+                oddPart++;
+                odd += (char) i;
+            }
+            for (int j = 0; j < count[i] / 2; j++) {
+                bank[indexBank++] = (char) i;
+            }
+        }
+        if (oddPart > 1) {
+            return new ArrayList<String>();
+        }
+        Set<String> result = new HashSet<>();
+        int[] visited = new int[bank.length];
+        helper(bank, "", result, odd, visited);
+        return new ArrayList<>(result);
+    }
+
+    private static void helper(char[] bank, String temp, Set<String> result, String odd, int[] visited) {
+        if (temp.length() == bank.length) {
+            StringBuilder sb = new StringBuilder(temp);
+            result.add(temp + odd + sb.reverse().toString());
+            return;
+        }
+        for (int i = 0; i < bank.length; i++) {
+            if (visited[i] == 1 || (i != 0 && bank[i] == bank[i - 1] && visited[i - 1] == 0)) {
+                continue;
+            }
+            temp += bank[i];
+            visited[i] = 1;
+            helper(bank, temp, result, odd, visited);
+            visited[i] = 0;
+            temp = temp.substring(0, temp.length() - 1);
+        }
+        return;
+    }
+
+    public enum fills {people, bicycle, empty};
+
+    private static int distance(int a, int b, int N) {
+        return Math.abs(a / N - b / N) + Math.abs(a % N - b % N);
+    }
+
+    public static class pair {
+        int peopleID;
+        int bicycleID;
+        int distance;
+        pair (int x, int y, int z) {
+            peopleID = x;
+            bicycleID = y;
+            distance = z;
+        }
+    }
+
+    public static List<Pair<Integer, Integer>> findMatch(fills[][] grid) {
+        Set<Integer> people = new HashSet<>();
+        Set<Integer> bicycles = new HashSet<>();
+        PriorityQueue<pair> queue = new PriorityQueue<>(new Comparator<pair>(){
+            @Override
+            public int compare(pair o1, pair o2) {
+                return o1.distance - o2.distance;
+            }
+        });
+        int row = grid.length;
+        int column = grid[0].length;
+        for (int i = 0; i < row; i++) {
+            for (int j = 0; j < column; j++) {
+                if (grid[i][j] == fills.people) {
+                    people.add(i * column + j);
+                } else if (grid[i][j] == fills.bicycle) {
+                    bicycles.add(i * column + j);
+                }
+            }
+        }
+        for (int eachPeople : people) {
+            for (int bicycle : bicycles) {
+                queue.offer(new pair(eachPeople, bicycle, distance(eachPeople, bicycle, column)));
+            }
+        }
+        List<Pair<Integer, Integer>> result = new ArrayList<>();
+        while (!queue.isEmpty() && !people.isEmpty() && !bicycles.isEmpty()) {
+            pair curr = queue.poll();
+            if (people.contains(curr.peopleID) && bicycles.contains(curr.bicycleID)) {
+                result.add(new Pair<>(curr.peopleID, curr.bicycleID));
+                people.remove(curr.peopleID);
+                bicycles.remove(curr.bicycleID);
+            }
+        }
+        return result;
+    }
+
+    private static int com(int a, int b) {
+        int countA = Integer.bitCount(a);
+        int countB = Integer.bitCount(b);
+        if (countA > countB) {
+            return 1;
+        } else if (countA < countB) {
+            return -1;
+        } else {
+            return a > b ? 1 : -1;
+        }
+    }
+
+    public static List<Integer> rearrange(List<Integer> elements) {
+        PriorityQueue<Integer> queue = new PriorityQueue<Integer>(elements.size(), new Comparator<Integer>(){
+            public int compare(Integer a, Integer b) {
+                return com(a, b);
+            }
+        });
+        for (int i : elements) {
+            queue.add(i);
+        }
+        List<Integer> result = new ArrayList<>();
+        while (!queue.isEmpty()) {
+            result.add(queue.poll());
+        }
+        return result;
+    }
+    class bitCompare implements Comparator<Integer> {
+        public int compare (Integer a, Integer b) {
+            return -1;
+        }
+    }
+
+    public static List<List<Integer>> permute(int n) {
+        List<Integer> bank = new ArrayList<>();
+        int i = 1;
+        while (i <= n) {
+            bank.add(i++);
+        }
+        List<List<Integer>> result = new ArrayList<>();
+        List<Integer> temp = new ArrayList<>();
+        helper1(bank, temp, result,  n);
+        return result;
+    }
+
+    private static void helper1(List<Integer> bank, List<Integer> temp
+            , List<List<Integer>> result, int size)
+    {
+        if (temp.size() == size) {
+            result.add(new ArrayList<>(temp));
+            return;
+        }
+
+            for (int i = 0; i < bank.size(); i++) {
+                if (temp.contains(bank.get(i))) {
+                    continue;
+                }
+                if (!temp.isEmpty() && ((temp.get(temp.size() - 1) % 2 != 0) ^ (bank.get(i) % 2 == 0))) {
+                    continue;
+                }
+                temp.add(bank.get(i));
+                helper1(bank, temp, result, size);
+                temp.remove(temp.size() - 1);
+            }
+    }
+
     public static void main(String[] args) {
-//        ListNode l = new ListNode(1);
+//        ListNode l = new ListNode(7);
 //        ListNode l2 = new ListNode(2);
 //        l.next = l2;
-//        ListNode l3 = new ListNode(1);
+//        ListNode l3 = new ListNode(4);
 //        ListNode l4 = new ListNode(3);
-//        l.next = l2;
 //        l2.next = l3;
 //        l3.next = l4;
+//        ListNode l5 = new ListNode(5);
+//        ListNode l6 = new ListNode(6);
+//        ListNode l7 = new ListNode(4);
+//        l5.next = l6;
+//        l6.next = l7;
+//        addTwoNumbers(l, l5);
 //        sortList(l);
 ////        reverseWords("the sky is blue");
 //        int[][] temp = new int[][]{{0,1,0},{0,0,1},{1,1,1},{0,0,0}};
 //        gameOfLife(temp);
-        System.out.print(checkInclusion("eb", "eidbaooo"));
+//        int[][] temp = new int[][]{{1,1,0},{0,1,1},{0,0,0},{1,1,1},{0,1,0}};
+//        System.out.print(numDistinctIslands(temp));
+//        int[] temp = new int[]{3,2,1,6,0,5};
+//        constructMaximumBinaryTree1(temp);
+//        System.out.println('z' - 'A');
+//        char[] test = new char[6];
+//        for (char c : test) {
+//            System.out.println(c);
+//        }
+//        int[][] temp = new int[][]{{3,0,1,4,2},{5,6,3,2,1},{1,2,0,1,5},{4,1,0,1,7},{1,0,3,0,5}};
+//        NumMatrix(temp);
+//        System.out.println(sumRegion(2,1,4,3));
+//        System.out.println(backspaceCompare("y#fo##f", "y#f#o##f"));
+        //System.out.println(repeatedStringMatch("abcd", "cdabcdab"));
+//        System.out.println(generatePalindromes("aaa"));
+//        fills[][] input = new fills[][]{{fills.bicycle, fills.empty, fills.empty, fills.people, fills.empty}
+//                                        , {fills.empty, fills.empty, fills.bicycle, fills.empty, fills.empty}
+//                                        , {fills.empty, fills.empty, fills.empty, fills.empty, fills.empty}
+//                                        , {fills.empty, fills.empty, fills.empty, fills.empty, fills.people}
+//                                        , {fills.empty, fills.empty, fills.people, fills.empty, fills.bicycle}
+//                                        , {fills.empty, fills.empty, fills.empty, fills.empty, fills.empty}};
+//        List<Pair<Integer, Integer>> result = findMatch(input);
+//        for (Pair<Integer, Integer> p : result) {
+//            System.out.print(p.getKey());
+//            System.out.println("->" + p.getValue());
+//        }
+//        List<Integer> list = new ArrayList<>();
+//        list.add(3);
+//        list.add(2);
+//        list.add(1);
+//        System.out.println(rearrange(list).toString());
+        for (List<Integer> list : permute(4)) {
+            System.out.println(list.toString());
+        }
     }
 }
